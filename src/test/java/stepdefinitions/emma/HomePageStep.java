@@ -18,4 +18,23 @@ public class HomePageStep {
     public void createNewClient(){
         hp.createNewClient();
     }
+
+    @Step("Create new cashLoan")
+    public void clickLoan(){
+        hp.clickLoan();
+        hp.searchTrnValidation();
+    }
+
+    @Step("Verify TRN is ready")
+    public void verifyTrn(){
+        hp.searchTrnValidation();
+        hp.clickSearchTrn();
+        hp.waitApproveBox();
+    }
+
+    @Step("Search client status")
+    public void searchClientStatus(String country){
+        hp.searchTrnValidation();
+        hp.clickSearchTrn();
+    }
 }

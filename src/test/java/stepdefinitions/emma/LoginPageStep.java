@@ -6,9 +6,8 @@ import pageStructures.emma.LoginPage;
 public class LoginPageStep {
     LoginPage loginPage;
 
-    @Step("Open browser on Emma web app")
+    @Step("Open browser and navigate to Emma")
     public void openEmma(){
-        loginPage.openBrowser();
         loginPage.navigateToEmma();
         loginPage.clickLogin();
     }

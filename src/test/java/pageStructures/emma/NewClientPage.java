@@ -3,6 +3,12 @@ package pageStructures.emma;
 import constants.SystemConstants;
 import helpers.PageAction;
 import net.serenitybdd.core.pages.WebElementFacade;
+import org.openqa.selenium.InvalidElementStateException;
+import starter.IdCalculator;
+
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
 
 public class NewClientPage extends PageAction {
 
@@ -10,11 +16,14 @@ public class NewClientPage extends PageAction {
 
     public void insertTRN(){
         inputTrn = findElement(SystemConstants.BY_ID, "inputDoc");
-        doAction(SystemConstants.PA_SEND_KEYS, inputTrn, "100056789");
+        waitForElementVisibility(inputTrn);
+        doAction(SystemConstants.PA_SEND_KEYS, inputTrn, IdCalculator.getInstance().getTRN());
     }
 
     public void sendTRN(){
         doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_ID, "button-form-credit-validation"));
+        isElementOnScreen(findElement(SystemConstants.BY_XPATH,
+                "//*[contains(text(),'Loading...')]"));
     }
 
     public void waitToLoad(){
@@ -24,8 +33,13 @@ public class NewClientPage extends PageAction {
 
     public void firsName(){
         inputName = findElement(SystemConstants.BY_XPATH, "//input[@formcontrolname='firstName']");
-        waitForElementVisibility(inputName);
+        isElementOnScreen(findElement(SystemConstants.BY_XPATH,
+                "//*[contains(text(),'Loading...')]"));
         doAction(SystemConstants.PA_SEND_KEYS, inputName,"Rigoberto");
+        System.out.println();
+        if(!inputName.getAttribute("value").contains("Rigoberto")){
+            firsName();
+        }
     }
 
     public void middleName(){
@@ -50,12 +64,15 @@ public class NewClientPage extends PageAction {
 
     public void email(){
         doAction(SystemConstants.PA_SEND_KEYS, findElement(SystemConstants.BY_XPATH,
-                "//input[@formcontrolname='email']"),"c12233444@mail.com");
+                "//input[@formcontrolname='email']"),"m"+IdCalculator.getInstance().getTRN() + "@mail.com");
     }
 
     public void birthDate(){
         doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH,
                 "//input[@formcontrolname='dateOfBirth']"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"(//*[contains(@aria-describedby,'mat-calendar-button-')])[1]"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"(//div[text()=' 1990 '])[1]"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"(//div[contains(text(),' JAN')])[1]"));
         doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"(//div[text()=' 1 '])[1]"));
 
     }
@@ -65,6 +82,8 @@ public class NewClientPage extends PageAction {
     }
 
     public void successFully(){
+        isElementOnScreen(findElement(SystemConstants.BY_XPATH,
+                "//*[contains(text(),'Loading...')]"));
         doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_ID, "preApprovedOk"));
     }
 
@@ -74,15 +93,15 @@ public class NewClientPage extends PageAction {
     }
     public void selectCountryOrigin(){
         doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH, "(//mat-select)[2]"));
-        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Bahamas')]"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Jamaica')]"));
     }
     public void selectMarriedStatus(){
         doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH, "(//mat-select)[3]"));
-        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Common Law')]"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Married')]"));
     }
     public void selectPaymentFreq(){
         doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH, "(//mat-select)[4]"));
-        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Weekly')]"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"(//*[contains(text(),' Monthly ')])[2]"));
     }
 
     public void numberDependents(){
@@ -90,7 +109,7 @@ public class NewClientPage extends PageAction {
     }
 
     public void netIncome(){
-        doAction(SystemConstants.PA_SEND_KEYS, findElement(SystemConstants.BY_XPATH, "(//input)[2]"), "900000");
+        doAction(SystemConstants.PA_SEND_KEYS, findElement(SystemConstants.BY_XPATH, "(//input)[2]"), "1200000");
     }
 
     public void homeAddress(){
@@ -109,16 +128,31 @@ public class NewClientPage extends PageAction {
 
     public void selectOccupation(){
         doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH, "(//mat-select)[1]"));
-        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Fisherman')]"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Business O')]"));
     }
 
     public void monthsWorkIn(){
-        doAction(SystemConstants.PA_SEND_KEYS,findElement(SystemConstants.BY_XPATH,"(//input)[4]"),"20");
+        try {
+            doAction(SystemConstants.PA_SEND_KEYS,findElement(SystemConstants.BY_XPATH,"(//input)[4]"),"120");
+        }catch (InvalidElementStateException e){
+            doAction(SystemConstants.PA_SEND_KEYS,findElement(SystemConstants.BY_XPATH,"(//input)[1]"),"120");
+        }
+
     }
 
     public void selectEconomyAct(){
         doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH, "(//mat-select)[2]"));
-        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Familiar H')]"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Salary')]"));
+    }
+
+    public void selectDateWork(){
+        doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH,
+                "//input[@aria-haspopup='dialog']"));
+        doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH,
+                "//span[contains(@id,'mat-calendar-button-')]"));
+        doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH,"//div[contains(text(),'2010')]"));
+        doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH,"//div[contains(text(),'JAN')]"));
+        doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH,"//div[contains(text(),' 1 ')]"));
     }
 
     public void selectPP(){
@@ -126,22 +160,88 @@ public class NewClientPage extends PageAction {
         doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[text()=' No ']"));
     }
 
-    public void selectParish(){
+    public void selectParish(String region){
         doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH, "(//mat-select)[1]"));
-        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Hanover')]"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'"+region+"')]"));
     }
 
-    public void selectDistrict(){
+    public void  employerName(){
+        doAction(SystemConstants.PA_SEND_KEYS, findElement(SystemConstants.BY_XPATH,
+                        "(//input)[2]"),
+                    "Rigo Berto Cam");
+    }
+
+    public void workAddress(){
+        doAction(SystemConstants.PA_SEND_KEYS,
+                findElement(SystemConstants.BY_XPATH,
+                        "(//textarea)[1]"),
+                IdCalculator.getInstance().getTRN());
+    }
+
+    public void  workNumber(){
+        doAction(SystemConstants.PA_SEND_KEYS, findElement(SystemConstants.BY_XPATH,
+                        "(//input)[3]"),
+                IdCalculator.getInstance().getTRN());
+    }
+
+    public void selectDistrict(String region){
         doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH, "(//mat-select)[2]"));
-        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Ramble')]"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'"+region+"')]"));
     }
 
     public void selectResidentStatus(){
         doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH, "(//mat-select)[3]"));
-        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Rent')]"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//*[contains(text(),'Owner')]"));
     }
 
     public void currentAddress(){
-        doAction(SystemConstants.PA_SEND_KEYS,findElement(SystemConstants.BY_XPATH,"(//input)[1]"),"22");
+        doAction(SystemConstants.PA_SEND_KEYS,findElement(SystemConstants.BY_XPATH,"(//input)[1]"),"122");
     }
+
+    public void contactName(){
+        doAction(SystemConstants.PA_SEND_KEYS,findElement(SystemConstants.BY_XPATH,"(//input)[1]"),"Rigoberto Campos");
+    }
+
+    public void contactNameAruba(){
+        doAction(SystemConstants.PA_SEND_KEYS,findElement(SystemConstants.BY_XPATH,"(//input)[3]"),"Rigoberto Campos V");
+    }
+
+    public void contactNumber(){
+        doAction(SystemConstants.PA_SEND_KEYS,findElement(SystemConstants.BY_XPATH,"(//input)[2]"),"8122334");
+    }
+
+    public void contactNumberAruba(){
+        doAction(SystemConstants.PA_SEND_KEYS,findElement(SystemConstants.BY_XPATH,"(//input)[4]"),"7122334");
+    }
+
+    public void uploadFile(String optFile){
+        doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_XPATH,"//span[contains(text(),'"+optFile+"')]"));
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//span[contains(text(),'Upload Document')]"));
+        StringSelection str = new StringSelection("C:\\Users\\rigoberto_campos\\OneDrive - Grupo Unicomer Unicomer Group\\Imágenes\\dni.PNG");
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(str,null);
+        try {
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            robot.keyPress(KeyEvent.VK_V);
+
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            robot.keyRelease(KeyEvent.VK_V);
+
+            robot.keyPress(KeyEvent.VK_ENTER);
+            robot.keyRelease(KeyEvent.VK_ENTER);
+
+        }catch(AWTException e){
+
+        }
+
+    }
+
+    public void sendAllData(){
+        doAction(SystemConstants.PA_CLICK,findElement(SystemConstants.BY_XPATH,"//span[contains(text(),'NEXT')]"));
+    }
+
+    public void waitingResponse(){
+        doAction(SystemConstants.PA_CLICK, findElement(SystemConstants.BY_ID, "button-credit-app-waiting-response"));
+    }
+
 }

@@ -3,25 +3,29 @@ package helpers;
 import constants.SystemConstants;
 import net.serenitybdd.core.pages.WebElementFacade;
 import net.thucydides.core.pages.PageObject;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import static org.openqa.selenium.support.locators.RelativeLocator.with;
 
 public class PageAction extends PageObject {
 
     private String keys;
     private int actionTries = 1;
 
+    private WebElement tempPath;
+
     public WebElementFacade findElement(String opt, String value){
         switch (opt){
             case SystemConstants.BY_ID:
+                //WebElement e = getDriver().findElement(By.id("sd"));
                return $(By.id(value));
             case SystemConstants.BY_NAME:
                 return $(By.name(value));
             case SystemConstants.BY_XPATH:
                 return $(By.xpath(value));
+            case SystemConstants.BY_LEFT_SELECTOR:
+                return (WebElementFacade) getDriver().findElement(with(By.xpath(value)).toLeftOf(tempPath));
             default:
                 return null;
         }
@@ -38,12 +42,13 @@ public class PageAction extends PageObject {
                     setText(element, this.keys);
                     break;
             }
-            actionTries = 0;
-        }catch (StaleElementReferenceException e){
-            if(actionTries > 5){
+            //actionTries = 0;
+        }catch (StaleElementReferenceException | ElementClickInterceptedException e){
+            if(actionTries > 4){
                 actionTries = 0;
                 return;
             }else{
+                //System.out.println("NO SALIMOS DEL COUNT");
                 actionTries = actionTries + 1;
                 doAction(opt,element);
             }
@@ -53,12 +58,6 @@ public class PageAction extends PageObject {
     public void doAction(String opt, WebElementFacade element, String keys){
         this.keys = keys;
         doAction(opt, element);
-    }
-
-
-
-    public void openBrowser(){
-        getDriver().manage().window().maximize();
     }
 
     public void navigateTo(String url){
@@ -87,15 +86,48 @@ public class PageAction extends PageObject {
         );
     }
 
+    public void waitForUrl(String url){
+        try {
+            waitForCondition().until(ExpectedConditions.urlContains(url));
+        }catch (TimeoutException e){
+            navigateTo(url);
+        }
+
+    }
+
     public void waitForElementVisibility(WebElementFacade element){
         try {
-            waitForTextToAppear("Loading...");
-            waitForCondition().until(
-                    ExpectedConditions.visibilityOf(element)
-            ).isDisplayed();
-            waitForTextToDisappear("Loading...");
+            element.waitUntilVisible();
         }catch (TimeoutException e){
             return;
         }
+    }
+
+    public boolean isElementOnScreen(WebElementFacade element){
+        try {
+            System.out.println("pilas ---------------------------------> " + element.isDisplayed());
+            if(element.isDisplayed()){
+                return isElementOnScreen(element);
+            }
+            else return false;
+        }catch (StaleElementReferenceException | NoSuchElementException e){
+            return false;
+        }
+    }
+
+    public boolean waitElementOnScreen(WebElementFacade element){
+        try {
+            System.out.println(element.isDisplayed() + " ---------------------------------------");
+            if(!element.isDisplayed()){
+                waitElementOnScreen(element);
+            }
+            return true;
+        }catch (StaleElementReferenceException | NoSuchElementException e){
+            return waitElementOnScreen(element);
+        }
+    }
+
+    public void setTempPath(WebElement tempPath) {
+        this.tempPath = tempPath;
     }
 }
